@@ -4,12 +4,6 @@ library(shinydashboard)
 
 recommendation <- read.csv('https://raw.githubusercontent.com/amrrs/sample_revenue_dashboard_shiny/master/recommendation.csv',stringsAsFactors = F,header=T)
 
-ui <- dashboardPage(
-    dashboardHeader(),
-    dashboardSidebar(),
-    dashboardBody()
-)
-
 # Dashboard header carrying the title of the dashboard
 header <- dashboardHeader(title = "Basic Dashboard")
 
@@ -45,8 +39,11 @@ frow2 <- fluidRow(
     )
 )
 
-# COmbine the two fluid rows to make the body
+# Combine the two fluid rows to make the body
 body <- dashboardBody(frow1, frow2)
+
+# Complete the UI part with dashboardPage
+ui <- dashboardPage(title = 'This is my Page title', header, sidebar, body, skin='red')
 
 
 
