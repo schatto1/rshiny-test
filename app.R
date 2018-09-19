@@ -10,6 +10,18 @@ ui <- dashboardPage(
     dashboardBody()
 )
 
+# Dashboard header carrying the title of the dashboard
+header <- dashboardHeader(title = "Basic Dashboard")
+
+# Sidebar content of the dashboard
+sidebar <- dashboardSidebar(
+    sidebarMenu(
+        menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+        menuItem("Visit-us", icon = icon("send", lib = 'glyphicon'), 
+                 href = "https://www.salesforce.com")
+    )
+)
+
 server <- function(input, output) { }
 
 shinyApp(ui, server)
