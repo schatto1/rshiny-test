@@ -16,6 +16,10 @@ sidebar <- dashboardSidebar(
     )
 )
 
+# Example is a sales revenue dashboard, showing three Key Performance Indicator
+# (KPI) boxes on the top that represent a quick summary, followed by two box plots
+# for a detailed view.
+
 # Align UI elements on the screen
 frow1 <- fluidRow(
     valueBoxOutput("value1"),
@@ -45,8 +49,49 @@ body <- dashboardBody(frow1, frow2)
 # Complete the UI part with dashboardPage
 ui <- dashboardPage(title = 'This is my Page title', header, sidebar, body, skin='red')
 
-
-
-server <- function(input, output) { }
-
-shinyApp(ui, server)
+# Create the server function for the dashboard
+server <- function(input, output) { 
+    #some data manipulation to derive the values of KPI boxes
+    total.revenue <- sum(recommendation$Revenue)
+    sales.account <- recommendation %>% group_by(Account) %>% summarise(value = sum(Revenue)) %>% filter(value==max(value))
+    prof.prod <- recommendation %>% group_by(Product) %>% summarise(value = sum(Revenue)) %>% filter(value==max(value))
+    #creating the valueBoxOutput content
+    output$value1 <- renderValueBox({
+        valueBox(
+            formatC(sales.account$value, format="d", big.mark=','),
+            paste('Top Account:',sales.account$Account),
+            icon = icon("stats",lib='glyphicon'),
+            color = "purple")  
+    })
+    output$value2 <- renderValueBox({ 
+        valueBox(
+            formatC(total.revenue, format="d", big.mark=','),
+            'Total Expected Revenue',
+            icon = icon("gbp",lib='glyphicon'),
+            color = "green")  
+    })
+    output$value3 <- renderValueBox({
+        valueBox(
+            formatC(prof.prod$value, format="d", big.mark=','),
+            paste('Top Product:',prof.prod$Product),
+            icon = icon("menu-hamburger",lib='glyphicon'),
+            color = "yellow")   
+    })
+    #creating the plotOutput content
+    output$revenuebyPrd <- renderPlot({
+        ggplot(data = recommendation, 
+               aes(x=Product, y=Revenue, fill=factor(Region))) + 
+            geom_bar(position = "dodge", stat = "identity") + ylab("Revenue (in Euros)") + 
+            xlab("Product") + theme(legend.position="bottom" 
+                                    ,plot.title = element_text(size=15, face="bold")) + 
+            ggtitle("Revenue by Product") + labs(fill = "Region")
+    })
+    output$revenuebyRegion <- renderPlot({
+        ggplot(data = recommendation, 
+               aes(x=Account, y=Revenue, fill=factor(Region))) + 
+            geom_bar(position = "dodge", stat = "identity") + ylab("Revenue (in Euros)") + 
+            xlab("Account") + theme(legend.position="bottom" 
+                                    ,plot.title = element_text(size=15, face="bold")) + 
+            ggtitle("Revenue by Region") + labs(fill = "Region")
+    })
+}
