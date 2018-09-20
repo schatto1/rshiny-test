@@ -1,6 +1,9 @@
 ## app.R ##
+# load the required packages
 library(shiny)
-library(shinydashboard)
+require(shinydashboard)
+library(ggplot2)
+library(dplyr)
 
 recommendation <- read.csv('https://raw.githubusercontent.com/amrrs/sample_revenue_dashboard_shiny/master/recommendation.csv',stringsAsFactors = F,header=T)
 
@@ -95,3 +98,6 @@ server <- function(input, output) {
             ggtitle("Revenue by Region") + labs(fill = "Region")
     })
 }
+
+#run/call the shiny app
+shinyApp(ui, server)
